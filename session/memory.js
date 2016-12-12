@@ -83,14 +83,15 @@ MemoryStore.prototype.length = function length(callback) {
 
 /**
  * Touch the given session object associated with the given session ID.
+ *
  */
 MemoryStore.prototype.touch = function touch(sessionId, session, callback) {
-  var currentSession = getSession.call(this, sessionId);
+  var currentSession = getSession.call(this, sessionId);//根据sessionID获取session
 
   if (currentSession) {
-    // update expiration
+    // update expiration（更新session 过期事件）
     currentSession.cookie = session.cookie;
-    this.sessions[sessionId] = JSON.stringify(currentSession)
+    this.sessions[sessionId] = JSON.stringify(currentSession);//JSON字符串化
   }
 
   callback && defer(callback)
@@ -100,15 +101,14 @@ MemoryStore.prototype.touch = function touch(sessionId, session, callback) {
  * Get session from the store.
  * @private
  */
-
 function getSession(sessionId) {
-  var sess = this.sessions[sessionId];
+  var sess = this.sessions[sessionId];//根据sesionId 从 session组中获取session
 
-  if (!sess) {
+  if (!sess) { //不存在则返回
     return;
   }
 
-  // 格式化session
+  //JSON话session ，因为session存储都是用的字符串（redis里面用的字符串格式，应该都是这样通用的）
   sess = JSON.parse(sess);
 
   //获取过期时间戳

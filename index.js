@@ -67,13 +67,13 @@ function session(options) {
   // get the session id generate function （sessionId生成方式，默认uid）
   var generateId = opts.genid || generateSessionId;
 
-  // get the session cookie name （获取cookie的name ，用于以后分析）
+  // get the session cookie name （获取session 的cookie的name ，用于以后分析）
   var name = opts.name || opts.key || 'connect.sid';
 
   // get the session store（获取session 的存储引擎，默认为内存存储）
   var store = opts.store || new MemoryStore();
 
-// get the trust proxy setting
+  // get the trust proxy setting
   var trustProxy = opts.proxy;
 
   // get the resave session option
@@ -85,9 +85,10 @@ function session(options) {
   // get the save uninitialized session option
   var saveUninitializedSession = opts.saveUninitialized;
 
-  // get the cookie signing secret
+  // get the cookie signing secret （cookie签名的密钥）
   var secret = opts.secret;
 
+  ///**************  以上都是对各种参数的校验  start  **************////
   if (typeof generateId !== 'function') {
     throw new TypeError('genid option must be a function');
   }
@@ -129,23 +130,23 @@ function session(options) {
     console.warn(warning);
   }
 
-  ///**************  以上都是对各种参数的校验   **************////
+  ///**************  以上都是对各种参数的校验  end  **************////
 
   // generates the new session （生成新的session）
   store.generate = function (req) {
-    req.sessionID = generateId(req);
-    req.session = new Session(req);
-    req.session.cookie = new Cookie(cookieOptions);
+    req.sessionID = generateId(req);  //生成新的sessionID
+    req.session = new Session(req);  //生成新的session
+    req.session.cookie = new Cookie(cookieOptions);//给session上挂钩新的 cookie
 
-    if (cookieOptions.secure === 'auto') {
+    if (cookieOptions.secure === 'auto') {    // ？？？？？？这一块 好像是cookie 安全问题（还有什么代理。。。不懂）
       req.session.cookie.secure = issecure(req, trustProxy);
     }
   };
 
-  var storeImplementsTouch = typeof store.touch === 'function';
+  var storeImplementsTouch = typeof store.touch === 'function';//判断store.touch 是否是一个函数
 
   // register event listeners for the store to track readiness
-  // 注册时间监听器 用于 追踪store 是否就绪
+  // 注册时间监听器 用于 追踪store 是否就绪（这个是给第三方预留的监听，例如redis，对自身的memory的session无效）
   var storeReady = true;
   store.on('disconnect', function ondisconnect() {
     storeReady = false
@@ -161,15 +162,15 @@ function session(options) {
       return;
     }
 
-    // Handle connection as if there is no session if （连接handle）
-    // the store has temporarily disconnected etc
+    // Handle connection as if there is no session if（处理连接 如果没有连接）
+    // the store has temporarily disconnected etc （这个session仓库暂时失去连接）
     if (!storeReady) {
       debug('store is disconnected');
       next();
       return
     }
 
-    // pathname mismatch （路径不匹配）
+    // pathname mismatch （不匹配的路径则跳过）
     var originalPath = parseUrl.original(req).pathname;
     if (originalPath.indexOf(cookieOptions.path || '/') !== 0) return next();
 
@@ -188,18 +189,18 @@ function session(options) {
     var savedHash;
     var touched = false;
 
-    // expose store
+    // expose store（req上挂钩 session 存储引擎）
     req.sessionStore = store;
 
-    // get the session ID from the cookie
+    // get the session ID from the cookie（从cookie里面获取 sessionID）
     var cookieId = req.sessionID = getcookie(req, name, secrets);
 
-    // set-cookie
+    // set-cookie（设置cookie）    //onHeaders(设置一个监听器，当需要写一个响应头时 执行操作）
     onHeaders(res, function () {
       if (!req.session) {
         debug('no session');
         return;
-      }
+      }//如果不是session请求跳过
 
       if (!shouldSetCookie(req)) {
         return;
@@ -221,7 +222,7 @@ function session(options) {
       setcookie(res, name, req.sessionID, secrets[0], req.session.cookie.data);
     });
 
-    // proxy end() to commit the session
+    // proxy end() to commit the session （代理结束，提交这个session）
     var _end = res.end;
     var _write = res.write;
     var ended = false;
@@ -333,7 +334,7 @@ function session(options) {
       return _end.call(res, chunk, encoding);
     };
 
-    // generate the session
+    // generate the session （生成session）
     function generate() {
       store.generate(req);
       originalId = req.sessionID;
@@ -400,7 +401,7 @@ function session(options) {
 
     // determine if cookie should be set on response （确定这个cookie是否应该设置在响应上）
     function shouldSetCookie(req) {
-      // cannot set cookie without a session ID （不能设置一个cookie，因为没有一个sessionId）
+      // cannot set cookie without a session ID （没有sessionID的话 不能设置一个cookie）
       if (typeof req.sessionID !== 'string') {
         return false;
       }
@@ -410,19 +411,20 @@ function session(options) {
           : rollingSessions || req.session.cookie.expires != null && isModified(req.session);
     }
 
-
     // generate a session if the browser doesn't send a sessionID
+    // 生成一个sessionID  如果浏览器 没有传送sessionID 过来的话 （getcookie方法中获取的）
     if (!req.sessionID) {
       debug('no SID sent, generating session');
-      generate();
+      generate();// 生成id
       next();
       return;
     }
 
-    // generate the session object
+    // generate the session object （生成session对象）
     debug('fetching %s', req.sessionID);
-    store.get(req.sessionID, function(err, sess){
-      // error handling
+    //就是根绝sessionID 获取 session
+    store.get(req.sessionID, function (err, sess) {
+      // error handling （错误句柄）
       if (err) {
         debug('error %j', err);
 
@@ -432,8 +434,7 @@ function session(options) {
         }
 
         generate();
-        // no session
-      } else if (!sess) {
+      } else if (!sess) { // no session
         debug('no session found');
         generate();
         // populate req.session
@@ -454,7 +455,6 @@ function session(options) {
     });
   }
 }
-
 
 /**
  * Generate a session ID for a new session.
@@ -601,7 +601,6 @@ function setcookie(res, name, val, secret, options) { //val 为sessionId
 
   res.setHeader('set-cookie', header)
 }
-
 
 /**
  * Verify and decode the given `val` with `secrets`.

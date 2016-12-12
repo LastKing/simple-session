@@ -44,11 +44,11 @@ Store.prototype.load = function (sid, fn) {
  * @api private
  */
 Store.prototype.createSession = function (req, sess) {
-  var expires = sess.cookie.expires
-      , orig = sess.cookie.originalMaxAge;
+  var expires = sess.cookie.expires;    //cookie 过期事件
+  var orig = sess.cookie.originalMaxAge;//cookie 最大数
 
-  sess.cookie = new Cookie(sess.cookie);
-  if ('string' == typeof expires) sess.cookie.expires = new Date(expires);
+  sess.cookie = new Cookie(sess.cookie);//根据session中cookie创建一个session
+  if ('string' == typeof expires) sess.cookie.expires = new Date(expires);//格式化 过期事件
   sess.cookie.originalMaxAge = orig;
   req.session = new Session(req, sess);
   return req.session;
