@@ -30,13 +30,13 @@ module.exports.MemoryStore = MemoryStore;
  * @private
  */
 var warning = 'Warning: connect.session() MemoryStore is not\n'
-    + 'designed for a production environment, as it will leak\n'
-    + 'memory, and will not scale past a single process.';
+  + 'designed for a production environment, as it will leak\n'
+  + 'memory, and will not scale past a single process.';
 
 /* istanbul ignore next */
 var defer = typeof setImmediate === 'function'
-    ? setImmediate
-    : function (fn) {
+  ? setImmediate
+  : function (fn) {
   process.nextTick(fn.bind.apply(fn, arguments))
 };
 
@@ -261,8 +261,8 @@ function session(options) {
         if (!isNaN(contentLength) && contentLength > 0) {
           // measure chunk
           chunk = !Buffer.isBuffer(chunk)
-              ? new Buffer(chunk, encoding)
-              : chunk;
+            ? new Buffer(chunk, encoding)
+            : chunk;
           encoding = undefined;
 
           if (chunk.length !== 0) {
@@ -342,7 +342,7 @@ function session(options) {
       wrapmethods(req.session);
     }
 
-    // wrap session methods
+    // wrap session methods （包装 session 方法）
     function wrapmethods(sess) {
       var _save = sess.save;
 
@@ -384,8 +384,8 @@ function session(options) {
       }
 
       return !saveUninitializedSession && cookieId !== req.sessionID
-          ? isModified(req.session)
-          : !isSaved(req.session)
+        ? isModified(req.session)
+        : !isSaved(req.session)
     }
 
     // determine if session should be touched
@@ -407,8 +407,8 @@ function session(options) {
       }
 
       return cookieId != req.sessionID
-          ? saveUninitializedSession || isModified(req.session)
-          : rollingSessions || req.session.cookie.expires != null && isModified(req.session);
+        ? saveUninitializedSession || isModified(req.session)
+        : rollingSessions || req.session.cookie.expires != null && isModified(req.session);
     }
 
     // generate a session if the browser doesn't send a sessionID
@@ -424,8 +424,7 @@ function session(options) {
     debug('fetching %s', req.sessionID);
     //就是根绝sessionID 获取 session
     store.get(req.sessionID, function (err, sess) {
-      // error handling （错误句柄）
-      if (err) {
+      if (err) {  // error handling （错误句柄）
         debug('error %j', err);
 
         if (err.code !== 'ENOENT') {
@@ -436,8 +435,7 @@ function session(options) {
         generate();
       } else if (!sess) { // no session
         debug('no session found');
-        generate();
-        // populate req.session
+        generate();   // populate req.session（填充session）
       } else {
         debug('session found');
         store.createSession(req, sess);
@@ -569,16 +567,16 @@ function issecure(req, trustProxy) {
   if (trustProxy !== true) {
     var secure = req.secure;
     return typeof secure === 'boolean'
-        ? secure
-        : false;
+      ? secure
+      : false;
   }
 
   // read the proto from x-forwarded-proto header
   var header = req.headers['x-forwarded-proto'] || '';
   var index = header.indexOf(',');
   var proto = index !== -1
-      ? header.substr(0, index).toLowerCase().trim()
-      : header.toLowerCase().trim()
+    ? header.substr(0, index).toLowerCase().trim()
+    : header.toLowerCase().trim()
 
   return proto === 'https';
 }
@@ -596,8 +594,8 @@ function setcookie(res, name, val, secret, options) { //val 为sessionId
 
   var prev = res.getHeader('set-cookie') || [];      //获得以前已经存在的
   var header = Array.isArray(prev) ? prev.concat(data)
-      : Array.isArray(data) ? [prev].concat(data)
-      : [prev, data];
+    : Array.isArray(data) ? [prev].concat(data)
+    : [prev, data];
 
   res.setHeader('set-cookie', header)
 }

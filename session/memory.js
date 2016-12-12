@@ -7,9 +7,9 @@ var Store = require('./store');
 
 /**  Shim setImmediate for node.js < 0.10 */
 var defer =
-    typeof setImmediate === 'function' ? setImmediate : function fn(fn) {
-      process.nextTick(fn.bind.apply(fn, arguments))
-    };
+  typeof setImmediate === 'function' ? setImmediate : function fn(fn) {
+    process.nextTick(fn.bind.apply(fn, arguments))
+  };
 
 module.exports = MemoryStore;
 
@@ -113,8 +113,8 @@ function getSession(sessionId) {
 
   //获取过期时间戳
   var expires = typeof sess.cookie.expires === 'string'
-      ? new Date(sess.cookie.expires)
-      : sess.cookie.expires;
+    ? new Date(sess.cookie.expires)
+    : sess.cookie.expires;
 
   // destroy expired session （销毁过期session）
   if (expires && expires <= Date.now()) {
@@ -124,7 +124,3 @@ function getSession(sessionId) {
 
   return sess
 }
-
-
-
-

@@ -10,8 +10,8 @@ var Cookie = module.exports = function Cookie(options) {
   this.httpOnly = true; // 禁止客户端修改 cookie
   if (options) merge(this, options);
   this.originalMaxAge = undefined == this.originalMaxAge
-      ? this.maxAge
-      : this.originalMaxAge;
+    ? this.maxAge
+    : this.originalMaxAge;
 };
 
 Cookie.prototype = {
@@ -45,8 +45,8 @@ Cookie.prototype = {
    */
   set maxAge(ms) {
     this.expires = 'number' == typeof ms
-        ? new Date(Date.now() + ms)
-        : ms;
+      ? new Date(Date.now() + ms)
+      : ms;
   },
 
   /**
@@ -57,8 +57,8 @@ Cookie.prototype = {
    */
   get maxAge() {
     return this.expires instanceof Date
-        ? this.expires.valueOf() - Date.now()
-        : this.expires;
+      ? this.expires.valueOf() - Date.now()
+      : this.expires;
   },
 
   /**
@@ -99,9 +99,3 @@ Cookie.prototype = {
     return this.data;
   }
 };
-
-
-
-
-
-

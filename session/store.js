@@ -34,25 +34,21 @@ Store.prototype.load = function (sid, fn) {
   })
 };
 
-
 /**
  * Create session from JSON `sess` data.
- *
+ * 根据JSON格式的sess 数据 创建一个session
  * @param {IncomingRequest} req
  * @param {Object} sess
  * @return {Session}
  * @api private
  */
 Store.prototype.createSession = function (req, sess) {
-  var expires = sess.cookie.expires;    //cookie 过期事件
+  var expires = sess.cookie.expires;    //cookie 过期时间
   var orig = sess.cookie.originalMaxAge;//cookie 最大数
 
   sess.cookie = new Cookie(sess.cookie);//根据session中cookie创建一个session
-  if ('string' == typeof expires) sess.cookie.expires = new Date(expires);//格式化 过期事件
+  if ('string' == typeof expires) sess.cookie.expires = new Date(expires);//格式化 过期时间
   sess.cookie.originalMaxAge = orig;
   req.session = new Session(req, sess);
   return req.session;
 };
-
-
-

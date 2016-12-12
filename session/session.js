@@ -1,7 +1,6 @@
 /**
  * Created by Rain on 2016/12/8.
  */
-
 module.exports = Session;
 
 /**
@@ -37,7 +36,6 @@ function Session(req, data) {
 defineMethod(Session.prototype, 'touch', function touch() {
   return this.resetMaxAge();
 });
-
 
 /**
  * Reset `.maxAge` to `.originalMaxAge`.
@@ -130,4 +128,3 @@ function defineMethod(obj, name, fn) {
     writable: true
   })
 }
-
