@@ -30,13 +30,13 @@ module.exports.MemoryStore = MemoryStore;
  * @private
  */
 var warning = 'Warning: connect.session() MemoryStore is not\n'
-  + 'designed for a production environment, as it will leak\n'
-  + 'memory, and will not scale past a single process.';
+    + 'designed for a production environment, as it will leak\n'
+    + 'memory, and will not scale past a single process.';
 
 /* istanbul ignore next */
 var defer = typeof setImmediate === 'function'
-  ? setImmediate
-  : function (fn) {
+    ? setImmediate
+    : function (fn) {
   process.nextTick(fn.bind.apply(fn, arguments))
 };
 
@@ -206,7 +206,7 @@ function session(options) {
         return;
       }
 
-      // only send secure cookies via https
+      // only send secure cookies via https（只能通过https传送 安全的cookies）
       if (req.session.cookie.secure && !issecure(req, trustProxy)) {
         debug('not secured');
         return;
@@ -222,11 +222,11 @@ function session(options) {
       setcookie(res, name, req.sessionID, secrets[0], req.session.cookie.data);
     });
 
-    // proxy end() to commit the session （代理结束，提交这个session）
+    // proxy end() to commit the session （代理 end()方法，提交这个session）
     var _end = res.end;
     var _write = res.write;
     var ended = false;
-    res.end = function end(chunk, encoding) {
+    res.end = function end(chunk, encoding) {  //重新定义res上的end方法
       if (ended) {  //结束标志
         return false;
       }
@@ -236,6 +236,7 @@ function session(options) {
       var ret;
       var sync = true;
 
+      //调用原来的end方法
       function writeend() {
         if (sync) {
           ret = _end.call(res, chunk, encoding);
@@ -246,6 +247,7 @@ function session(options) {
         _end.call(res);
       }
 
+      //调用原来的write方法
       function writetop() {
         if (!sync) {
           return ret;
@@ -259,10 +261,10 @@ function session(options) {
         var contentLength = Number(res.getHeader('Content-Length'));
 
         if (!isNaN(contentLength) && contentLength > 0) {
-          // measure chunk
+          // measure chunk （测量chunk）
           chunk = !Buffer.isBuffer(chunk)
-            ? new Buffer(chunk, encoding)
-            : chunk;
+              ? new Buffer(chunk, encoding)
+              : chunk;
           encoding = undefined;
 
           if (chunk.length !== 0) {
@@ -294,7 +296,7 @@ function session(options) {
         return writetop();
       }
 
-      // no session to save
+      // no session to save （没有session保存）
       if (!req.session) {
         debug('no session');
         return _end.call(res, chunk, encoding);
@@ -375,7 +377,7 @@ function session(options) {
       return req.sessionID && unsetDestroy && req.session == null;
     }
 
-    // determine if session should be saved to store
+    // determine if session should be saved to store （决定 session 是不是应该保存到 store中）
     function shouldSave(req) {
       // cannot set cookie without a session ID
       if (typeof req.sessionID !== 'string') {
@@ -384,8 +386,8 @@ function session(options) {
       }
 
       return !saveUninitializedSession && cookieId !== req.sessionID
-        ? isModified(req.session)
-        : !isSaved(req.session)
+          ? isModified(req.session)
+          : !isSaved(req.session)
     }
 
     // determine if session should be touched
@@ -399,7 +401,7 @@ function session(options) {
       return cookieId === req.sessionID && !shouldSave(req);
     }
 
-    // determine if cookie should be set on response （确定这个cookie是否应该设置在响应上）
+    // determine if cookie should be set on response （在这个响应上是不是应该设置cookie）
     function shouldSetCookie(req) {
       // cannot set cookie without a session ID （没有sessionID的话 不能设置一个cookie）
       if (typeof req.sessionID !== 'string') {
@@ -407,8 +409,8 @@ function session(options) {
       }
 
       return cookieId != req.sessionID
-        ? saveUninitializedSession || isModified(req.session)
-        : rollingSessions || req.session.cookie.expires != null && isModified(req.session);
+          ? saveUninitializedSession || isModified(req.session)
+          : rollingSessions || req.session.cookie.expires != null && isModified(req.session);
     }
 
     // generate a session if the browser doesn't send a sessionID
@@ -531,7 +533,7 @@ function getcookie(req, name, secrets) {
 
 /**
  * Hash the given `sess` object omitting changes to `.cookie`.
- *
+ * hash 指定 省略了 cookie 的session
  * @param {Object} sess
  * @return {String}
  * @private
@@ -546,7 +548,7 @@ function hash(sess) {
 
 /**
  * Determine if request is secure.
- *
+ * 决定request 请求是否安全
  * @param {Object} req
  * @param {Boolean} [trustProxy]
  * @return {Boolean}
@@ -567,16 +569,16 @@ function issecure(req, trustProxy) {
   if (trustProxy !== true) {
     var secure = req.secure;
     return typeof secure === 'boolean'
-      ? secure
-      : false;
+        ? secure
+        : false;
   }
 
   // read the proto from x-forwarded-proto header
   var header = req.headers['x-forwarded-proto'] || '';
   var index = header.indexOf(',');
   var proto = index !== -1
-    ? header.substr(0, index).toLowerCase().trim()
-    : header.toLowerCase().trim()
+      ? header.substr(0, index).toLowerCase().trim()
+      : header.toLowerCase().trim()
 
   return proto === 'https';
 }
@@ -594,8 +596,8 @@ function setcookie(res, name, val, secret, options) { //val 为sessionId
 
   var prev = res.getHeader('set-cookie') || [];      //获得以前已经存在的
   var header = Array.isArray(prev) ? prev.concat(data)
-    : Array.isArray(data) ? [prev].concat(data)
-    : [prev, data];
+      : Array.isArray(data) ? [prev].concat(data)
+      : [prev, data];
 
   res.setHeader('set-cookie', header)
 }
