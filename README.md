@@ -103,10 +103,11 @@ sessionID 在cookie中的name，设置在response中（和从request中读）。
   - `undefined` 使用来自express的"trust proxy"设置
 
 ##### resave
-强制将session保存到session 仓库（store）中。即使session在请求未被修改过。根据你的store这可能是需要的，
-but it can also create race conditions where a client makes two parallel requests to your server and changes made to the session in one request may get overwritten when the other request ends, even if it made no changes (this behavior also depends on what store you're using).
+强制将session保存到session store 中。即使session在请求过程中从未被修改过。根据你的store这可能是需要的，
+但是它也可能会造成竞争条件（create race conditions）当其中一个客户端发送两个平行的请求到你的服务器时，
+and changes made to the session in one request may get overwritten when the other request ends, even if it made no changes (this behavior also depends on what store you're using).
 
-这个默认值是`true`，但是使用默认值已经过时，未来可能会改变。请研究这个设置和选项，在什么使用情况下适合你，通常情况下，你会想要`false`。
+这个默认值是`true`，但是使用默认值已经过时，所以未来可能会改变。请仔细研究这个设置和选项，在什么使用情况下适合你，通常情况下，你会想要`false`。
 
 How do I know if this is necessary for my store? The best way to know is to check with your store if it implements the touch method. If it does, then you can safely set resave: false. If it does not implement the touch method and your store sets an expiration date on stored sessions, then you likely need resave: true.
 
