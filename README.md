@@ -1,18 +1,18 @@
-#Simple-session
+# Simple-session
 
-##就是复写express-session
+## 就是复写express-session
 
-##安装
+## 安装
 ````bash
 npm install express-session
 ````
 
-##API
+## API
 ```js
 var session=require('express-session');
 ```
 
-###session(options)
+### session(options)
 
 用指定的options创建一个session中间件
 
